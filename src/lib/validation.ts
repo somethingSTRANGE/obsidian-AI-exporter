@@ -7,45 +7,16 @@ import { containsPathTraversal } from './path-utils';
 import { MIN_PORT, MAX_PORT, MAX_VAULT_PATH_LENGTH, MIN_API_KEY_LENGTH } from './constants';
 
 /**
- * Allowed callout types
- */
-export const ALLOWED_CALLOUT_TYPES = [
-  'NOTE',
-  'TIP',
-  'IMPORTANT',
-  'WARNING',
-  'CAUTION',
-  'ABSTRACT',
-  'SUMMARY',
-  'TLDR',
-  'INFO',
-  'TODO',
-  'SUCCESS',
-  'CHECK',
-  'DONE',
-  'QUESTION',
-  'HELP',
-  'FAQ',
-  'FAILURE',
-  'FAIL',
-  'MISSING',
-  'DANGER',
-  'ERROR',
-  'BUG',
-  'EXAMPLE',
-  'QUOTE',
-  'CITE',
-] as const;
-
-type CalloutType = (typeof ALLOWED_CALLOUT_TYPES)[number];
-
-/**
  * Validate callout type
+ *
+ * Accepts any string that Obsidian supports as a callout identifier,
+ * including custom types defined in CSS snippets (e.g. "ai-prompt").
+ * Allows letters, digits, hyphens, and underscores; rejects anything else.
  */
-export function validateCalloutType(type: string, defaultType: CalloutType): CalloutType {
+export function validateCalloutType(type: string, defaultType: string): string {
   const normalized = type.toUpperCase().trim();
-  if (ALLOWED_CALLOUT_TYPES.includes(normalized as CalloutType)) {
-    return normalized as CalloutType;
+  if (/^[A-Z0-9_-]+$/.test(normalized)) {
+    return normalized;
   }
   console.warn(`[G2O] Invalid callout type "${type}", using default "${defaultType}"`);
   return defaultType;
