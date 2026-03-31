@@ -136,7 +136,7 @@ function populateForm(settings: ExtensionSettings): void {
   const { templateOptions } = settings;
   elements.messageFormat.value = templateOptions.messageFormat || 'callout';
   elements.userCallout.value = templateOptions.userCalloutType || 'QUESTION';
-  elements.assistantCallout.value = templateOptions.assistantCalloutType || 'NOTE';
+  elements.assistantCallout.value = templateOptions.assistantCalloutType;
 
   elements.includeId.checked = templateOptions.includeId ?? true;
   elements.includeTitle.checked = templateOptions.includeTitle ?? true;
@@ -328,7 +328,9 @@ function collectSettings(): ExtensionSettings {
   const templateOptions: TemplateOptions = {
     messageFormat,
     userCalloutType: validateCalloutType(elements.userCallout.value || 'QUESTION', 'QUESTION'),
-    assistantCalloutType: validateCalloutType(elements.assistantCallout.value || 'NOTE', 'NOTE'),
+    assistantCalloutType: elements.assistantCallout.value.trim()
+      ? validateCalloutType(elements.assistantCallout.value, 'NOTE')
+      : '',
     includeId: elements.includeId.checked,
     includeTitle: elements.includeTitle.checked,
     includeTags: elements.includeTags.checked,

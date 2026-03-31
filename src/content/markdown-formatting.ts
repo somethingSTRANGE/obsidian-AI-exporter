@@ -33,6 +33,10 @@ export function formatMessage(
     case 'callout': {
       const calloutType = role === 'user' ? options.userCalloutType : options.assistantCalloutType;
       const label = role === 'user' ? 'User' : assistantLabel;
+      // Empty assistant callout type → render as plain text (no blockquote wrapping, no label)
+      if (!calloutType) {
+        return markdown;
+      }
       // Format as Obsidian callout with proper line handling
       const lines = markdown.split('\n');
       const formattedLines = lines.map((line, i) =>
