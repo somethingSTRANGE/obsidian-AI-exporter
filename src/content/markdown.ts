@@ -10,7 +10,7 @@
 import { formatMessage, formatToolContent } from './markdown-formatting';
 import { convertDeepResearchContent } from './markdown-deep-research';
 import { generateHash } from '../lib/hash';
-import { MAX_FILENAME_BASE_LENGTH, FILENAME_ID_SUFFIX_LENGTH } from '../lib/constants';
+import { MAX_FILENAME_LENGTH, FILENAME_ID_SUFFIX_LENGTH } from '../lib/constants';
 import type {
   ConversationData,
   ObsidianNote,
@@ -24,17 +24,21 @@ export { htmlToMarkdown, escapeAngleBrackets } from './markdown-rules';
 export { convertDeepResearchContent } from './markdown-deep-research';
 
 /**
- * Generate sanitized filename from title
+ * Generate filename from title.
+ * Preserves original casing; replaces only Windows-invalid characters with '_'.
+ * Appends an 8-char ID suffix in brackets for uniqueness, e.g.:
+ *   "Gemini App Conversation Limitations [df678ce8].md"
  */
 export function generateFileName(title: string, conversationId: string): string {
+  // "YYYY-MM-DD - " (13) + " [" (2) + id + "]" (1) + ".md" (3) = 19
+  const maxTitleLength = MAX_FILENAME_LENGTH - FILENAME_ID_SUFFIX_LENGTH - 19;
   const sanitized = title
-    .toLowerCase()
-    .replace(/[^a-z0-9\u3000-\u9fff\uac00-\ud7af]+/g, '-') // Keep Japanese/Korean chars
-    .replace(/^-+|-+$/g, '')
-    .substring(0, MAX_FILENAME_BASE_LENGTH);
+    .trim()
+    .replace(/[\\/:*?"<>|]/g, '_')
+    .substring(0, maxTitleLength);
 
   const idSuffix = conversationId.substring(0, FILENAME_ID_SUFFIX_LENGTH);
-  return `${sanitized || 'conversation'}-${idSuffix}.md`;
+  return `${sanitized || 'conversation'} [${idSuffix}].md`;
 }
 
 /**
